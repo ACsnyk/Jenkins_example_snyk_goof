@@ -40,7 +40,7 @@ pipeline {
                 script{
                 latest_version=sh(script: """
                 curl -LIs "https://github.com/snyk/snyk/releases/latest" | grep "^location" |awk -F'/' '{print \$NF}' | tail -1
-                """, returnStdout: true)
+                """, returnStdout: true).trim()
                 println "[INFO] Extracted latest version: ${latest_version}"
                 snyk_cli_dl_linux="https://github.com/snyk/snyk/releases/download/${latest_version}/snyk-linux"
                 println "[INFO] Extracted download link for linux: ${snyk_cli_dl_linux}"
