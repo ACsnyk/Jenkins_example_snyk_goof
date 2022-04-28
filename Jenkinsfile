@@ -59,7 +59,14 @@ pipeline {
         // Consider using --severity-threshold=<low|medium|high> for more granularity (see snyk help for more info).
         stage('Snyk Test using Snyk CLI') {
             steps {
+                script{
+                    try{
                 sh './snyk test'
+                }
+                catch (exception) {
+                    println "[WARN] Snyk test command failed due to:\n${exception}"
+                }
+              }
             }
         }
 
@@ -72,4 +79,9 @@ pipeline {
             }
         }
     }
+    post { 
+        always { 
+            cleanWs()
+        }
+    }    
 }
