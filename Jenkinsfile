@@ -42,12 +42,9 @@ pipeline {
                 curl -LIs "https://github.com/snyk/snyk/releases/latest" | grep "^location" |awk -F'/' '{print \$NF}' | tail -1
                 """, returnStdout: true)
                 println "[INFO] Extracted latest version: ${latest_version}"
+                snyk_cli_dl_linux="https://github.com/snyk/snyk/releases/download/${latest_version}/snyk-linux"
+                println "[INFO] Extracted download link for linux: ${snyk_cli_dl_linux}"
                 sh """
-                    echo "Latest Snyk CLI Version: ${latest_version}"
-
-                    snyk_cli_dl_linux="https://github.com/snyk/snyk/releases/download/${latest_version}/snyk-linux"
-                    echo "Download URL: ${snyk_cli_dl_linux}"
-
                     curl -Lo ./snyk "${snyk_cli_dl_linux}"
                     chmod +x snyk
                     ls -la
