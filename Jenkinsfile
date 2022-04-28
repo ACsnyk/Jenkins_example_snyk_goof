@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     // Install the Jenkins tools you need for your project / environment
-    tools {nodejs "nodejs"}
+    tools {nodejs "Nodejs14"}
 
     // Pull your Snyk token from a Jenkins encrypted credential
     // (type "Secret text"... see https://jenkins.io/doc/book/using/using-credentials/#adding-new-global-credentials)
