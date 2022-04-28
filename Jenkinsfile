@@ -39,7 +39,7 @@ pipeline {
             steps {
                 script{
                 latest_version=sh(script: """
-                curl -L -Is "https://github.com/snyk/snyk/releases/latest" | grep "^location" | sed s#.*tag/##g | tr -d "\r"
+                curl -L -Is "https://github.com/snyk/snyk/releases/latest" | grep "^location" | sed s#.*tag/##g | awk '{print \$NF}'
                 """, returnStdout: true)
                 //curl -L -Is "https://github.com/snyk/snyk/releases/latest" | grep "^location" | sed s#.*tag/##g | tr -d "\r"
                 println "[INFO] Extracted latest version: ${latest_version}"
