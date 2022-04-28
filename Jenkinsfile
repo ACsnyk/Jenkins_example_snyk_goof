@@ -37,6 +37,10 @@ pipeline {
         // Not required if just install the Snyk CLI on your Agent
         stage('Download Snyk CLI') {
             steps {
+                latest_version=sh(script: """
+                curl -Is "https://github.com/snyk/snyk/releases/latest" | grep "^location" | sed s#.*tag/##g | tr -d "\r"
+                """, returnStdout: true)
+                println "[INFO] Extracted latest version: ${latest_version}"
                 sh '''
                     latest_version=$(curl -Is "https://github.com/snyk/snyk/releases/latest" | grep "^location" | sed s#.*tag/##g | tr -d "\r")
                     echo "Latest Snyk CLI Version: ${latest_version}"
