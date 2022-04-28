@@ -24,6 +24,7 @@ pipeline {
             steps {
                 git url: 'https://github.com/ACsnyk/snyk-goof.git'
                 sh 'ls -la'
+                sh  "npm install"
             }
         }
 
