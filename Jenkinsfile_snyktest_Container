@@ -54,19 +54,28 @@ pipeline {
                 }
             }
         }
-
+        
         // Run snyk test to check for vulnerabilities and fail the build if any are found
         // Consider using --severity-threshold=<low|medium|high> for more granularity (see snyk help for more info).
-        stage('Snyk Test using Snyk CLI') {
+        stage('Build Docker Image') {
+            steps {
+                script{
+                sh 'docker build . --tag Goof:Demo'
+                sh 'docker image ls'
+            }
+            }
+        }
+
+          stage('Snyk Container Test using Snyk CLI') {
             steps {
                 script{
                     try{
-                //sh './snyk test'
-                sh './snyk test'
+                sh './snyk container test Goof:Demo'
                 }
                 catch (exception) {
-                    println "[WARN] Snyk test command failed due to:\n${exception}"
+                    println "[WARN] Snyk code test command failed due to:\n${exception}"
                 }
+                sh 'docker image rm Goof:Demo'
               }
             }
         }
