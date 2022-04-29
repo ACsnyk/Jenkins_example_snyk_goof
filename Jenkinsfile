@@ -39,17 +39,12 @@ pipeline {
         stage('Download Snyk CLI') {
             steps {
                 script{
-                latest_version = sh(script: 'curl -Is "https://github.com/snyk/snyk/releases/latest" | grep "^location" | sed s#.*tag/##g', returnStdout: true)
-                latest_version = latest_version.trim()
-                echo "Latest Snyk CLI Version: ${latest_version}"
-                snyk_cli_dl_linux="https://static.snyk.io/cli/latest/snyk-linux"
-                echo "Download URL: ${snyk_cli_dl_linux}"
-                //latest_version=sh(script: """
-                // curl -LIs "https://github.com/snyk/snyk/releases/latest" | grep "^location" |awk -F'/' '{print \$NF}' | tail -1
-                // """, returnStdout: true).trim()
-                // println "[INFO] Extracted latest version: ${latest_version}"
-                // snyk_cli_dl_linux="https://github.com/snyk/snyk/releases/download/${latest_version}/snyk-linux"
-                //println "[INFO] Extracted download link for linux: ${snyk_cli_dl_linux}"
+                latest_version=sh(script: """
+                curl -LIs "https://github.com/snyk/snyk/releases/latest" | grep "^location" |awk -F'/' '{print \$NF}' | tail -1
+                """, returnStdout: true).trim()
+                println "[INFO] Extracted latest version: ${latest_version}"
+                snyk_cli_dl_linux="https://github.com/snyk/snyk/releases/download/${latest_version}/snyk-linux"
+                println "[INFO] Extracted download link for linux: ${snyk_cli_dl_linux}"
                 sh """
                     curl -Lo ./snyk "${snyk_cli_dl_linux}"
                     chmod +x snyk
@@ -67,7 +62,7 @@ pipeline {
                 script{
                     try{
                 //sh './snyk test'
-                sh './snyk code test'
+                sh './snyk test'
                 }
                 catch (exception) {
                     println "[WARN] Snyk test command failed due to:\n${exception}"
