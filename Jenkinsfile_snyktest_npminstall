@@ -31,7 +31,6 @@ pipeline{
         steps{
             script{
             sh 'npm install -g snyk'
-            sh 'npm install snyk-to-html -g'
             }
         }
     }
@@ -51,22 +50,29 @@ pipeline{
         steps{
             script{
         try{
-            sh 'snyk test --json | snyk-to-html -o result.html'
+            sh './snyk test'
         }
         catch (exception){
         println "[WARN] Snyk test command failed due to:\n${exception}"
         println " Testing Snyk code"
-        sh 'snyk code test --json | snyk-to-html -o result-code.html'
+        sh './snyk code test'
     
     }
 }
 }
     }
-   }
-
-post{
-    always{
-        archiveArtifacts artifacts: 'result*html'
+            // Capture the dependency tree for ongoing monitoring in Snyk.
+        // This is typically done after deployment to some environment (ex staging, test, production, etc).
+        stage('Snyk Monitor using Snyk CLI') {
+            steps {
+                // Use your own Snyk Organization with --org=<your-org>
+                sh './snyk monitor --org=alexandra.catana'
+            }
+        }
     }
-}
+    post { 
+        always { 
+            cleanWs()
+        }
+    }    
 }
