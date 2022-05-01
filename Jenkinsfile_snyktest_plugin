@@ -30,6 +30,7 @@ pipeline {
 
         stage('Test') {
             steps {
+              script{
               echo 'Testing...'
               try{
               snykSecurity(
@@ -50,3 +51,4 @@ pipeline {
         }
     } 
 }       
+}
