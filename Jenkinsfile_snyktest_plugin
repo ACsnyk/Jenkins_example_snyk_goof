@@ -1,0 +1,42 @@
+pipeline {
+    agent any
+
+    // Install the Jenkins tools you need for your project / environment
+    tools {nodejs "Nodejs14"}
+
+    stages {
+
+        stage('Initialize & Cleanup Workspace') {
+            steps {
+               println 'Initialize & Cleanup Workspace'
+               cleanWs()
+            }
+        }
+
+        stage('Git Clone') {
+            steps {
+                git url: 'https://github.com/ACsnyk/snyk-goof.git'
+                sh 'ls -la'
+                sh  "npm install"
+            }
+        }
+
+        stage('Test Build Requirements') {
+            steps {
+                sh 'npm -v'
+                sh 'node -v'
+            }
+        }
+
+        stage('Test') {
+            steps {
+              echo 'Testing...'
+              snykSecurity(
+                snykInstallation: 'snyk',
+                snykTokenId: 'Alex_snyk_token',
+                // place other parameters here
+              )
+            }
+        }
+    } 
+}       
