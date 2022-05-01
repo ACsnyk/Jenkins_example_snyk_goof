@@ -44,7 +44,7 @@ pipeline {
                 snykSecurity(
                 snykInstallation: 'snyk',
                 snykTokenId: 'Alex_snyk_token',
-                additionalArguments: ' --code'
+                additionalArguments: ' --code --debug'
               )
               }
             }
