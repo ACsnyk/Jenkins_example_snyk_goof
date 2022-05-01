@@ -39,7 +39,7 @@ pipeline{
     // Authorize the Snyk CLI
         stage('Authorize Snyk CLI') {
             steps{
-            withCredentials([string(credentialsId: 'Alex_snyk_token', variable: 'SNYK_TOKEN_VAR')]) {    
+            withCredentials([string(credentialsId: 'Alexandra_Snyktoken', variable: 'SNYK_TOKEN_VAR')]) {    
             sh 'snyk auth ${SNYK_TOKEN_VAR}'
         }
     }
