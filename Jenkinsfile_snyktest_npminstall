@@ -64,11 +64,9 @@ pipeline{
     }
    }
 
-    post{
-        always{
-            steps{
-            archiveArtifacts: 'result*html'
-            }
-        }
+post{
+    always{
+        archiveArtifacts artifacts: 'result*html'
     }
+}
 }
