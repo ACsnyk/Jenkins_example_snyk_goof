@@ -1,54 +1,62 @@
-pipeline {
+pipeline{
     agent any
 
-    // Install the Jenkins tools you need for your project / environment
     tools {nodejs "Nodejs14"}
 
-    stages {
+    stage('Initialize & Cleanup Workspace') {
+       println 'Initialize & Cleanup Workspace'
+            cleanWs()
+    }
 
-        stage('Initialize & Cleanup Workspace') {
-            steps {
-               println 'Initialize & Cleanup Workspace'
-               cleanWs()
+    stage('Git Clone') {
+        git url: 'https://github.com/ACsnyk/snyk-goof.git'
+            sh 'ls -la'
+            sh  "npm install"
+    }
+
+    stage('Test Build Requirements') {
+        sh 'npm -v'
+        sh 'node -v'
+    }
+
+    // Not required if you install the Snyk CLI on your Agent
+    stage('Npm install Snyk CLI') {
+        steps{
+            script{
+            sh 'npm install -g snyk'
+            sh 'npm install snyk-to-html -g'
             }
         }
+    }
 
-        stage('Git Clone') {
-            steps {
-                git url: 'https://github.com/ACsnyk/snyk-goof.git'
-                sh 'ls -la'
-                sh  "npm install"
-            }
+    // Authorize the Snyk CLI
+    withCredentials([string(credentialsId: 'Alex_snyk_token', variable: 'SNYK_TOKEN_VAR')]) {
+        stage('Authorize Snyk CLI') {
+            sh 'snyk auth ${SNYK_TOKEN_VAR}'
         }
+    }
 
-        stage('Test Build Requirements') {
-            steps {
-                sh 'npm -v'
-                sh 'node -v'
-            }
+    // Run snyk test to check for vulnerabilities and fail the build if any are found
+    // Consider using --severity-threshold=<low|medium|high> for more granularity (see snyk help for more info).
+    stage('Snyk Tests & Monitor') {
+        stept{
+            scripts{
+        try{
+            sh 'snyk test --json | snyk-to-html -o result.html'
         }
+        catch (exception){
+        println "[WARN] Snyk test command failed due to:\n${exception}"
+        println " Testing Snyk code"
+        sh 'snyk code test --json | snyk-to-html -o result-code.html'
+    
+    }
+}
+}
+    }
 
-        stage('Test') {
-            steps {
-              script{
-              echo 'Testing...'
-              try{
-              snykSecurity(
-                snykInstallation: 'snyk',
-                snykTokenId: 'Alex_snyk_token',
-              )
-              }
-              catch (exception){
-                println "[WARN] Snyk test command failed due to:\n${exception}"
-                println " Testing Snyk code"
-                snykSecurity(
-                snykInstallation: 'snyk',
-                snykTokenId: 'Alex_snyk_token',
-                additionalArguments: ' --code --debug'
-              )
-              }
-            }
+    post{
+        always{
+            archiveArtifacts:"result*html"
         }
-    } 
-}       
+    }
 }
