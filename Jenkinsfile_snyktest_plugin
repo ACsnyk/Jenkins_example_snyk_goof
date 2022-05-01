@@ -31,11 +31,21 @@ pipeline {
         stage('Test') {
             steps {
               echo 'Testing...'
+              try{
               snykSecurity(
+                snykInstallation: 'snyk',
+                snykTokenId: 'Alex_snyk_token',
+              )
+              }
+              catch (exception){
+                println "[WARN] Snyk test command failed due to:\n${exception}"
+                println " Testing Snyk code"
+                snykSecurity(
                 snykInstallation: 'snyk',
                 snykTokenId: 'Alex_snyk_token',
                 additionalArguments: ' --code'
               )
+              }
             }
         }
     } 
