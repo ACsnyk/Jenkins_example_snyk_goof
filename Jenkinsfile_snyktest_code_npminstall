@@ -1,0 +1,72 @@
+pipeline{
+    agent any
+
+    tools {nodejs "Nodejs14"}
+
+   stages{
+    stage('Initialize & Cleanup Workspace') {
+        steps{
+       println 'Initialize & Cleanup Workspace'
+            cleanWs()
+        }
+    }
+
+    stage('Git Clone') {
+        steps{
+        git url: 'https://github.com/ACsnyk/snyk-goof.git'
+            sh 'ls -la'
+            sh  "npm install"
+        }
+    }
+
+
+    //Install the Snyk CLI with npm (for more information, check:https://docs.snyk.io/snyk-cli/install-the-snyk-cli )
+    stage('Npm install Snyk CLI') {
+        steps{
+            script{
+            sh 'npm install -g snyk'
+            }
+        }
+    }
+
+    // Authorize the Snyk CLI
+        stage('Authorize Snyk CLI') {
+            steps{
+            withCredentials([string(credentialsId: 'Alexandra_Snyktoken', variable: 'SNYK_TOKEN_VAR')]) {    
+            sh 'snyk auth ${SNYK_TOKEN_VAR}'
+        }
+    }
+    }
+
+    // Run snyk test to check for vulnerabilities and fail the build if any are found
+    // Consider using --severity-threshold=<low|medium|high> for more granularity (see snyk help for more info).
+    stage('Snyk Tests & Monitor') {
+        steps{
+            script{
+        try{
+            sh 'snyk test'
+        }
+        catch (exception){
+        println "[WARN] Snyk test command failed due to:\n${exception}"
+        println " Testing Snyk code"
+            try{
+            sh 'snyk code test'
+            }
+            catch (ex){
+             println "[WARN] Snyk code test command failed due to:\n${ex}"
+             println " Run monitor"
+              sh 'snyk monitor --org=alexandra.catana'
+            }
+        }
+       }
+      }
+    }
+      
+    }
+    
+    post { 
+        always { 
+            cleanWs()
+        }
+    }    
+}
