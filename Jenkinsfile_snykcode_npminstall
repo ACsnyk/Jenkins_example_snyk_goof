@@ -44,7 +44,7 @@ pipeline{
             steps {
                 script{
                     try{
-                sh './snyk code test'
+                sh 'snyk code test'
                 }
                 catch (exception) {
                     println "[WARN] Snyk code test command failed due to:\n${exception}"
@@ -58,7 +58,7 @@ pipeline{
         stage('Snyk Monitor using Snyk CLI') {
             steps {
                 // Use your own Snyk Organization with --org=<your-org>
-                sh './snyk monitor --org=alexandra.catana'
+                sh 'snyk monitor --org=alexandra.catana'
             }
         }
     }
