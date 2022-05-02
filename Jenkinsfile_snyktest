@@ -28,14 +28,7 @@ pipeline {
             }
         }
 
-        stage('Test Build Requirements') {
-            steps {
-                sh 'npm -v'
-                sh 'node -v'
-            }
-        }
-
-        // Not required if just install the Snyk CLI on your Agent
+        //Check https://docs.snyk.io/snyk-cli/install-the-snyk-cli on ways to install the Snyk CLI
         stage('Download Snyk CLI') {
             steps {
                 script{
@@ -55,7 +48,7 @@ pipeline {
             }
         }
 
-        // Run snyk test to check for vulnerabilities and fail the build if any are found
+        // Run snyk test to check for vulnerabilities 
         // Consider using --severity-threshold=<low|medium|high> for more granularity (see snyk help for more info).
         stage('Snyk Test using Snyk CLI') {
             steps {

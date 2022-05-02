@@ -28,14 +28,7 @@ pipeline {
             }
         }
 
-        stage('Test Build Requirements') {
-            steps {
-                sh 'npm -v'
-                sh 'node -v'
-            }
-        }
-
-        // Not required if just install the Snyk CLI on your Agent
+        //Check https://docs.snyk.io/snyk-cli/install-the-snyk-cli on ways to install the Snyk CLI
         stage('Download Snyk CLI') {
             steps {
                 script{
@@ -55,17 +48,18 @@ pipeline {
             }
         }
         
+        
+         stage('Build Docker Image') {
+             steps {
+                 script{
+                 sh 'docker build . --tag Goof:Demo'
+                 sh 'docker image ls'
+             }
+             }
+         }
+
         // Run snyk test to check for vulnerabilities and fail the build if any are found
         // Consider using --severity-threshold=<low|medium|high> for more granularity (see snyk help for more info).
-        stage('Build Docker Image') {
-            steps {
-                script{
-                sh 'docker build . --tag Goof:Demo'
-                sh 'docker image ls'
-            }
-            }
-        }
-
           stage('Snyk Container Test using Snyk CLI') {
             steps {
                 script{

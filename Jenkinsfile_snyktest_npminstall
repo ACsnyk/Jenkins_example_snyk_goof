@@ -19,14 +19,8 @@ pipeline{
         }
     }
 
-    stage('Test Build Requirements') {
-        steps{
-        sh 'npm -v'
-        sh 'node -v'
-        }
-    }
 
-    // Not required if you install the Snyk CLI on your Agent
+    //Install the Snyk CLI with npm (for more information, check:https://docs.snyk.io/snyk-cli/install-the-snyk-cli )
     stage('Npm install Snyk CLI') {
         steps{
             script{
@@ -44,32 +38,30 @@ pipeline{
     }
     }
 
-    // Run snyk test to check for vulnerabilities and fail the build if any are found
-    // Consider using --severity-threshold=<low|medium|high> for more granularity (see snyk help for more info).
-    stage('Snyk Tests & Monitor') {
-        steps{
-            script{
-        try{
-            sh 'snyk test'
-        }
-        catch (exception){
-        println "[WARN] Snyk test command failed due to:\n${exception}"
-        println " Testing Snyk code"
-            try{
-            sh 'snyk code test'
-            }
-            catch (ex){
-             println "[WARN] Snyk code test command failed due to:\n${ex}"
-             println " Run monitor"
-              sh 'snyk monitor --org=alexandra.catana'
+     // Run snyk test to check for vulnerabilities 
+        // Consider using --severity-threshold=<low|medium|high> for more granularity (see snyk help for more info).
+        stage('Snyk Test using Snyk CLI') {
+            steps {
+                script{
+                    try{
+                sh './snyk test'
+                }
+                catch (exception) {
+                    println "[WARN] Snyk test command failed due to:\n${exception}"
+                }
+              }
             }
         }
-       }
-      }
+
+        // Capture the dependency tree for ongoing monitoring in Snyk.
+        // This is typically done after deployment to some environment (ex staging, test, production, etc).
+        stage('Snyk Monitor using Snyk CLI') {
+            steps {
+                // Use your own Snyk Organization with --org=<your-org>
+                sh './snyk monitor --org=alexandra.catana'
+            }
+        }
     }
-      
-    }
-    
     post { 
         always { 
             cleanWs()

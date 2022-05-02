@@ -28,14 +28,7 @@ pipeline {
             }
         }
 
-        stage('Test Build Requirements') {
-            steps {
-                sh 'npm -v'
-                sh 'node -v'
-            }
-        }
-
-        // Not required if just install the Snyk CLI on your Agent
+       //Check https://docs.snyk.io/snyk-cli/install-the-snyk-cli on ways to install the Snyk CLI
         stage('Download Snyk CLI') {
             steps {
                 script{
