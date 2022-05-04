@@ -54,7 +54,7 @@ pipeline {
             steps {
                 script{
                     try{
-                sh './snyk code test'
+                sh './snyk test'
                 }
                 catch (exception) {
                     println "[WARN] Snyk code test command failed due to:\n${exception}"
